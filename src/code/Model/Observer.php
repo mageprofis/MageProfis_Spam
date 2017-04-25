@@ -22,7 +22,7 @@ extends Mage_Core_Model_Abstract
 
         if ($penalty)
         {
-            $proto = '';
+            $proto = 'HTTP/1.0';
             if (isset($_SERVER['SERVER_PROTOCOL']))
             {
                 $proto = $_SERVER['SERVER_PROTOCOL'];
