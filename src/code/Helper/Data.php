@@ -47,16 +47,55 @@ extends Mage_Core_Helper_Data
 
     /**
      * 
+     * @return boolean
+     */
+    public function isOnXbl($ip)
+    {
+        $xblAddress = Mage::getStoreConfig('mpspam/general/xbl_address', 0);
+        if (!Mage::getStoreConfig('mpspam/general/use_xbl', 0) || empty($xblAddress))
+        {
+            return false;
+        }
+
+        $post = array('ip' => $ip);
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $xblAddress);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post));
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        $data = curl_exec($ch);
+        curl_close($ch);
+        if (trim($data) == 'BLOCKED')
+        {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 
      * @param string $ip
      * @return MageProfis_Spam_Helper_Data
      */
-    public function setPenaltyRequest($ip)
+    public function setPenaltyRequest($ip, $value = null)
     {
         $tbl = $this->_getTableName('mpspam/penalty');
         $ip = $this->_getConnection()->quoteInto('?', $ip);
         $date = date('Y-m-d H:i:s');
         $query = "INSERT INTO {$tbl} (ip, penalty, created_at) VALUES ({$ip}, 1, '{$date}') ON DUPLICATE KEY UPDATE penalty = penalty + 1;";
         $this->_getConnection('core_write')->query($query);
+        if (!is_null($value) && is_numeric($value))
+        {
+            $data = array(
+                'penalty' => $value
+            );
+            $where = 'ip = '.$ip;
+            $this->_getConnection('core_write')->update($tbl, $data, $where);
+        }
         return $this;
     }
 

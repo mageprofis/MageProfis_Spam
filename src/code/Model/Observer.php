@@ -24,6 +24,14 @@ extends Mage_Core_Model_Abstract
             $penalty = true;
         }
 
+        $ip = Mage::helper('core/http')->getRemoteAddr(false);
+        if(!$penalty && Mage::helper('mpspam')->isOnXbl($ip))
+        {
+            $penalty = true;
+            // set an higher result
+            Mage::helper('mpspam')->setPenaltyRequest($ip, 99);
+        }
+        
         if ($penalty)
         {
             $proto = 'HTTP/1.0';
