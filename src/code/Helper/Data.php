@@ -26,6 +26,27 @@ extends Mage_Core_Helper_Data
 
     /**
      * 
+     * @param string $ua
+     * @return boolean
+     */
+    public function checkUserAgent($ua)
+    {
+        $data = array(
+            'Firefox/7.0.1',
+        );
+        foreach ($data as $_data)
+        {
+            if (stristr($ua, $_data))
+            {
+                return false;
+                break;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 
      * @param string $ip
      * @return MageProfis_Spam_Helper_Data
      */

@@ -14,8 +14,12 @@ extends Mage_Core_Model_Abstract
         {
             $penalty = true;
         }
+        if (!$penalty && isset($_SERVER['HTTP_USER_AGENT']) && !Mage::helper('mpspam')->checkUserAgent($_SERVER['HTTP_USER_AGENT']))
+        {
+            $penalty = true;
+        }
         $ip = Mage::helper('core/http')->getRemoteAddr(false);
-        if(Mage::helper('mpspam')->isPenalty($ip))
+        if(!$penalty && Mage::helper('mpspam')->isPenalty($ip))
         {
             $penalty = true;
         }
