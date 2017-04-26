@@ -4,7 +4,7 @@ MageProfis_Spam
 Info
 -----------
 
-Since April 2017 we recognise many newsletter subscribtion requests in Magento 1.x Systems
+Since April 2017 we recognise many newsletter subscription requests in Magento 1.x Systems
 
 So we build up this Extension, to prevent the registrations from theses bots.
 
