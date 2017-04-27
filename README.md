@@ -12,6 +12,8 @@ There are also an Option to add an XBL Service.
 The Service have to result on Blocked IPs with "BLOCKED" as string.
 Information in the [Source Code](https://github.com/mageprofis/MageProfis_Spam/blob/4082eac6ee5966b3043df0625c96a777dad1e103/src/code/Helper/Data.php#L54-L55)
 
+to get some informations about the requests
+```cat /var/log/nginx/*-access.log* | grep '/newsletter/subscriber/new/' | grep POST | less```
 
 Requirements
 ------------

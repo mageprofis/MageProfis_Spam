@@ -33,6 +33,9 @@ extends Mage_Core_Helper_Data
     {
         $data = array(
             'Firefox/7.0.1',
+            'Firefox/8.0.1',
+            'Firefox/9.0.1',
+            'Firefox/10.0.1',
         );
         foreach ($data as $_data)
         {
