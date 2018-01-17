@@ -1,7 +1,6 @@
 <?php
 
-class MageProfis_Spam_Model_Observer
-extends Mage_Core_Model_Abstract
+class MageProfis_Spam_Model_Observer extends Mage_Core_Model_Abstract
 {
     /**
      * 
@@ -19,38 +18,59 @@ extends Mage_Core_Model_Abstract
             $penalty = true;
         }
         $ip = Mage::helper('core/http')->getRemoteAddr(false);
-        if(!$penalty && Mage::helper('mpspam')->isPenalty($ip))
+        if (!$penalty && Mage::helper('mpspam')->isPenalty($ip))
         {
             $penalty = true;
         }
 
-        if(!$penalty && Mage::helper('mpspam')->isOnXbl($ip))
+        if (!$penalty && Mage::helper('mpspam')->isOnXbl($ip))
         {
             $penalty = true;
             // set an higher result
             Mage::helper('mpspam')->setPenaltyRequest($ip, 99);
         }
-        
+
         if ($penalty)
         {
-            $proto = 'HTTP/1.0';
-            if (isset($_SERVER['SERVER_PROTOCOL']))
-            {
-                $proto = $_SERVER['SERVER_PROTOCOL'];
-            }
-            header($proto . ' 403 Forbidden');
-            $message = Mage::helper('mpspam')->__('Your request is not allowed');
-            echo $message;
-            Mage::getSingleton('core/session')->addError($message);
-            echo '<script type="text/javascript">window.location.href = "'.
-                    Mage::getUrl('').'"</script>';
-            exit;
+            $this->throw403();
         }
         Mage::helper('mpspam')->setPenaltyRequest($ip);
     }
-    
+
     public function cron()
     {
         Mage::helper('mpspam')->removeOld();
     }
+
+    public function controllerActionPredispatchCustomerAccountCreatepost($observer)
+    {
+        $mps_id = Mage::app()->getRequest()->getParam('mps_id');
+        $split = explode("O", $mps_id);
+        
+        if(!$mps_id)
+            $this->throw403();
+        
+        if(!is_array($split) || count($split)!=2)
+            $this->throw403();
+        
+        if($split[1]!=Mage::helper('mpspam')->getNumberOfTheDay())
+            $this->throw403();
+    }
+
+    public function throw403($with_exit = true)
+    {
+        $proto = 'HTTP/1.0';
+        if (isset($_SERVER['SERVER_PROTOCOL']))
+        {
+            $proto = $_SERVER['SERVER_PROTOCOL'];
+        }
+        header($proto . ' 403 Forbidden');
+        $message = Mage::helper('mpspam')->__('Your request is not allowed');
+        echo $message;
+        Mage::getSingleton('core/session')->addError($message);
+        echo '<script type="text/javascript">window.location.href = "' .
+        Mage::getUrl('') . '"</script>';
+        if($with_exit) exit;
+    }
+
 }

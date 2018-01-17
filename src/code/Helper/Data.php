@@ -115,6 +115,14 @@ extends Mage_Core_Helper_Data
         return $this;
     }
 
+    /*
+     * Return every day a new number
+     */
+    public function getNumberOfTheDay()
+    {
+        return date('j') + 123;
+    }
+    
     /**
      * 
      * @return Mage_Core_Model_Resource

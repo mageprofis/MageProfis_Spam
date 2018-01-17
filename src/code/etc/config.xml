@@ -35,6 +35,13 @@
         </resources>
     </global>
     <frontend>
+        <layout>
+            <updates>
+                <mpspam>
+                    <file>mageprofis_spam.xml</file>
+                </mpspam>
+            </updates>
+        </layout>
         <events>
             <controller_action_predispatch_newsletter_subscriber_new>
                 <observers>
@@ -45,6 +52,14 @@
                     </mpspam>
                 </observers>
             </controller_action_predispatch_newsletter_subscriber_new>
+            <controller_action_predispatch_customer_account_createpost>
+                <observers>
+                    <mpspam>
+                        <class>mpspam/observer</class>
+                        <method>controllerActionPredispatchCustomerAccountCreatepost</method>
+                    </mpspam>
+                </observers>
+            </controller_action_predispatch_customer_account_createpost>
         </events>
     </frontend>
     <crontab>

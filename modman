@@ -1,2 +1,4 @@
-MageProfis_Spam.xml                     app/etc/modules/MageProfis_Spam.xml
-src/code                                app/code/community/MageProfis/Spam
+MageProfis_Spam.xml                                 app/etc/modules/MageProfis_Spam.xml
+src/code                                            app/code/community/MageProfis/Spam
+src/design/base/default/layout/mageprofis_spam.xml  app/design/frontend/base/default/layout/mageprofis_spam.xml
+src/design/base/default/template/mageprofis/spam    app/design/frontend/base/default/template/mageprofis/spam
