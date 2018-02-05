@@ -8,37 +8,24 @@ class MageProfis_Spam_Model_Observer extends Mage_Core_Model_Abstract
      */
     public function penalty($event)
     {
-        $penalty = false;
-        if (isset($_SERVER['SERVER_PROTOCOL']) && $_SERVER['SERVER_PROTOCOL'] == 'HTTP/1.0')
+        if($this->_generalCheck())
         {
-            $penalty = true;
+            $this->throw403();
         }
-        $ua = isset($_SERVER['HTTP_USER_AGENT']) ? trim($_SERVER['HTTP_USER_AGENT']) : '';
-        if (!$penalty && (!isset($_SERVER['HTTP_USER_AGENT']) || empty($ua)))
-        {
-            $penalty = true;
-        }
-        if (!$penalty && isset($_SERVER['HTTP_USER_AGENT']) && !Mage::helper('mpspam')->checkUserAgent($_SERVER['HTTP_USER_AGENT']))
-        {
-            $penalty = true;
-        }
+
         $ip = Mage::helper('core/http')->getRemoteAddr(false);
-        if (!$penalty && Mage::helper('mpspam')->isPenalty($ip))
+        if (Mage::helper('mpspam')->isPenalty($ip))
         {
-            $penalty = true;
+            $this->throw403();
         }
 
         if (!$penalty && Mage::helper('mpspam')->isOnXbl($ip))
         {
-            $penalty = true;
             // set an higher result
             Mage::helper('mpspam')->setPenaltyRequest($ip, 99);
-        }
-
-        if ($penalty)
-        {
             $this->throw403();
         }
+
         Mage::helper('mpspam')->setPenaltyRequest($ip);
     }
 
@@ -47,23 +34,25 @@ class MageProfis_Spam_Model_Observer extends Mage_Core_Model_Abstract
         Mage::helper('mpspam')->removeOld();
     }
 
+    /**
+     * check on customer register
+     * 
+     * @return void
+     */
     public function controllerActionPredispatchCustomerAccountCreatepost($observer)
     {
-        $penalty = false;
-        if (isset($_SERVER['SERVER_PROTOCOL']) && $_SERVER['SERVER_PROTOCOL'] == 'HTTP/1.0')
+        if($this->_generalCheck())
         {
-            $penalty = true;
+            $this->throw403();
         }
-        $ua = isset($_SERVER['HTTP_USER_AGENT']) ? trim($_SERVER['HTTP_USER_AGENT']) : '';
-        if (!$penalty && (!isset($_SERVER['HTTP_USER_AGENT']) || empty($ua)))
+
+        $ip = Mage::helper('core/http')->getRemoteAddr(false);
+        if (Mage::helper('mpspam')->isPenalty($ip))
         {
-            $penalty = true;
+            $this->throw403();
         }
-        if (!$penalty && isset($_SERVER['HTTP_USER_AGENT']) && !Mage::helper('mpspam')->checkUserAgent($_SERVER['HTTP_USER_AGENT']))
-        {
-            $penalty = true;
-        }
-        
+
+        // check on Name values
         $checkNames = array(
             'firstname',
             'middlename',
@@ -71,41 +60,71 @@ class MageProfis_Spam_Model_Observer extends Mage_Core_Model_Abstract
         );
         foreach ($checkNames as $_name)
         {
-            if ($penalty)
-            {
-                break;
-            }
             $value = Mage::app()->getRequest()->getParam($_name);
             if (!empty($value) && (stristr($value, 'https://') || stristr($value, 'https://')))
             {
-                $penalty = true;
+                $this->throw403();
             }
         }
 
-        if (!$penalty)
+        $mps_id = Mage::app()->getRequest()->getParam('mps_id');
+        $split = explode("O", $mps_id);
+        
+        if(!$mps_id)
         {
-            $mps_id = Mage::app()->getRequest()->getParam('mps_id');
-            $split = explode("O", $mps_id);
-            
-            if(!$mps_id)
-            {
-                $this->throw403();
-            }
-            
-            if(!is_array($split) || count($split)!=2)
-            {
-                $this->throw403();
-            }
-            
-            if($split[1]!=Mage::helper('mpspam')->getNumberOfTheDay())
-            {
-                $this->throw403();
-            }
-        } else {
             $this->throw403();
         }
+        
+        if(!is_array($split) || count($split)!=2)
+        {
+            $this->throw403();
+        }
+        
+        if($split[1]!=Mage::helper('mpspam')->getNumberOfTheDay())
+        {
+            $this->throw403();
+        }
+        Mage::helper('mpspam')->setPenaltyRequest($ip);
     }
 
+    /**
+     * simple check on current request
+     * 
+     * @return bool
+     */
+    protected function _generalCheck()
+    {
+        // some perl scripts use 1.0 as default
+        if (isset($_SERVER['SERVER_PROTOCOL']) && $_SERVER['SERVER_PROTOCOL'] == 'HTTP/1.0')
+        {
+            return true;
+        }
+        // is the UA is empty, its not an customer
+        $ua = isset($_SERVER['HTTP_USER_AGENT']) ? trim($_SERVER['HTTP_USER_AGENT']) : '';
+        if ((!isset($_SERVER['HTTP_USER_AGENT']) || empty($ua)))
+        {
+            return true;
+        }
+        // most spammers used "//" in some cases :)
+        if (strstr(Mage::helper('core/url')->getCurrentUrl(), '//'))
+        {
+            return true;
+        }
+        // check general ua list
+        if (isset($_SERVER['HTTP_USER_AGENT']) && !Mage::helper('mpspam')->checkUserAgent($_SERVER['HTTP_USER_AGENT']))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * throw an simple 403
+     *   so other server tools may be able to block them fast
+     *   like fail2ban
+     * 
+     * @return void
+     */
     public function throw403($with_exit = true)
     {
         $proto = 'HTTP/1.0';
