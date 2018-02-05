@@ -13,6 +13,11 @@ class MageProfis_Spam_Model_Observer extends Mage_Core_Model_Abstract
         {
             $penalty = true;
         }
+        $ua = isset($_SERVER['HTTP_USER_AGENT']) ? trim($_SERVER['HTTP_USER_AGENT']) : '';
+        if (!$penalty && (!isset($_SERVER['HTTP_USER_AGENT']) || empty($ua)))
+        {
+            $penalty = true;
+        }
         if (!$penalty && isset($_SERVER['HTTP_USER_AGENT']) && !Mage::helper('mpspam')->checkUserAgent($_SERVER['HTTP_USER_AGENT']))
         {
             $penalty = true;
@@ -44,17 +49,61 @@ class MageProfis_Spam_Model_Observer extends Mage_Core_Model_Abstract
 
     public function controllerActionPredispatchCustomerAccountCreatepost($observer)
     {
-        $mps_id = Mage::app()->getRequest()->getParam('mps_id');
-        $split = explode("O", $mps_id);
+        $penalty = false;
+        if (isset($_SERVER['SERVER_PROTOCOL']) && $_SERVER['SERVER_PROTOCOL'] == 'HTTP/1.0')
+        {
+            $penalty = true;
+        }
+        $ua = isset($_SERVER['HTTP_USER_AGENT']) ? trim($_SERVER['HTTP_USER_AGENT']) : '';
+        if (!$penalty && (!isset($_SERVER['HTTP_USER_AGENT']) || empty($ua)))
+        {
+            $penalty = true;
+        }
+        if (!$penalty && isset($_SERVER['HTTP_USER_AGENT']) && !Mage::helper('mpspam')->checkUserAgent($_SERVER['HTTP_USER_AGENT']))
+        {
+            $penalty = true;
+        }
         
-        if(!$mps_id)
+        $checkNames = array(
+            'firstname',
+            'middlename',
+            'lastname'
+        );
+        foreach ($checkNames as $_name)
+        {
+            if ($penalty)
+            {
+                break;
+            }
+            $value = Mage::app()->getRequest()->getParam($_name);
+            if (!empty($value) && (stristr($value, 'https://') || stristr($value, 'https://')))
+            {
+                $penalty = true;
+            }
+        }
+
+        if (!$penalty)
+        {
+            $mps_id = Mage::app()->getRequest()->getParam('mps_id');
+            $split = explode("O", $mps_id);
+            
+            if(!$mps_id)
+            {
+                $this->throw403();
+            }
+            
+            if(!is_array($split) || count($split)!=2)
+            {
+                $this->throw403();
+            }
+            
+            if($split[1]!=Mage::helper('mpspam')->getNumberOfTheDay())
+            {
+                $this->throw403();
+            }
+        } else {
             $this->throw403();
-        
-        if(!is_array($split) || count($split)!=2)
-            $this->throw403();
-        
-        if($split[1]!=Mage::helper('mpspam')->getNumberOfTheDay())
-            $this->throw403();
+        }
     }
 
     public function throw403($with_exit = true)
