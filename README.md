@@ -15,6 +15,8 @@ Information in the [Source Code](https://github.com/mageprofis/MageProfis_Spam/b
 to get some informations about the requests
 ```cat /var/log/nginx/*-access.log* | grep '/newsletter/subscriber/new/' | grep POST | less```
 
+We also added the Support to prevent unwanted Customer registerations, we check a couple of incomming data.
+
 Requirements
 ------------
 - PHP >= 5.3.0
