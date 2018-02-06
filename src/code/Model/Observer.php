@@ -61,7 +61,7 @@ class MageProfis_Spam_Model_Observer extends Mage_Core_Model_Abstract
         foreach ($checkNames as $_name)
         {
             $value = Mage::app()->getRequest()->getParam($_name);
-            if (!empty($value) && (stristr($value, 'https://') || stristr($value, 'https://')))
+            if (!empty($value) && (stristr($value, 'http://') || stristr($value, 'https://')))
             {
                 $this->throw403();
             }
@@ -106,7 +106,8 @@ class MageProfis_Spam_Model_Observer extends Mage_Core_Model_Abstract
             return true;
         }
         // most spammers used "//" in some cases :)
-        if (strstr(Mage::helper('core/url')->getCurrentUrl(), '//'))
+        $url = str_replace(array('https://', 'http://'), '', Mage::helper('core/url')->getCurrentUrl());
+        if (strstr($url, '//'))
         {
             return true;
         }
