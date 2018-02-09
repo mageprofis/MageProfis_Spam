@@ -17,6 +17,12 @@ to get some informations about the requests
 
 We also added the Support to prevent unwanted Customer registerations, we check a couple of incomming data.
 
+Supported Areas
+---------------
+- contacts/index/post
+- newsletter/subscriber/new
+- customer/account/createpost
+
 Requirements
 ------------
 - PHP >= 5.3.0
