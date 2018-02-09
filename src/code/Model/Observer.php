@@ -19,7 +19,7 @@ class MageProfis_Spam_Model_Observer extends Mage_Core_Model_Abstract
             $this->throw403();
         }
 
-        if (!$penalty && Mage::helper('mpspam')->isOnXbl($ip))
+        if (Mage::helper('mpspam')->isOnXbl($ip))
         {
             // set an higher result
             Mage::helper('mpspam')->setPenaltyRequest($ip, 99);
@@ -32,6 +32,68 @@ class MageProfis_Spam_Model_Observer extends Mage_Core_Model_Abstract
     public function cron()
     {
         Mage::helper('mpspam')->removeOld();
+    }
+
+/**
+     * check on customer register
+     * 
+     * @return void
+     */
+    public function controllerActionPredispatchContactsIndexPost($observer)
+    {
+        if($this->_generalCheck())
+        {
+            $this->throw403();
+        }
+
+        $ip = Mage::helper('core/http')->getRemoteAddr(false);
+        if (Mage::helper('mpspam')->isPenalty($ip))
+        {
+            $this->throw403();
+        }
+
+        // check on Name values
+        $checkNames = array(
+            'name', // @ default mostly only this field
+            'firstname',
+            'middlename',
+            'lastname',
+            'telephone' // @ default mostly only this field
+        );
+        foreach ($checkNames as $_name)
+        {
+            $value = Mage::app()->getRequest()->getParam($_name);
+            if (!empty($value) && (stristr($value, 'http://') || stristr($value, 'https://')))
+            {
+                $this->throw403();
+            }
+        }
+
+        $mps_id = Mage::app()->getRequest()->getParam('mps_id');
+        $split = explode("O", $mps_id);
+        
+        if(!$mps_id)
+        {
+            $this->throw403();
+        }
+        
+        if(!is_array($split) || count($split)!=2)
+        {
+            $this->throw403();
+        }
+        
+        if($split[1]!=Mage::helper('mpspam')->getNumberOfTheDay())
+        {
+            $this->throw403();
+        }
+
+        if (Mage::helper('mpspam')->isOnXbl($ip))
+        {
+            // set an higher result
+            Mage::helper('mpspam')->setPenaltyRequest($ip, 99);
+            $this->throw403();
+        }
+        Mage::helper('mpspam')->setPenaltyRequest($ip);
     }
 
     /**

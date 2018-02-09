@@ -1,0 +1,9 @@
+<script>
+    var form_el = $$('#contactForm');
+    
+    if(form_el.length==1)
+    {
+        form_el = form_el[0];
+        form_el.insert('<input type="hidden" name="mps_id" value="84O<?php echo Mage::helper('mpspam')->getNumberOfTheDay() ?>" />');
+    }
+</script>

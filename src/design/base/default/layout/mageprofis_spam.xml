@@ -5,4 +5,9 @@
             <block type="core/template" name="mageprofis.spam.register_js" template="mageprofis/spam/customer/register_js.phtml" />
         </reference>
     </customer_account_create>
+    <contacts_index_index>
+        <reference name="content">
+            <block type="core/template" name="mageprofis.spam.register_js" template="mageprofis/spam/contacts/js.phtml" />
+        </reference>
+    </contacts_index_index>
 </layout>

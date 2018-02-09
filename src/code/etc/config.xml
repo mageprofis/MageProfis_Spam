@@ -60,6 +60,14 @@
                     </mpspam>
                 </observers>
             </controller_action_predispatch_customer_account_createpost>
+            <controller_action_predispatch_contacts_index_post>
+                <observers>
+                    <mpspam>
+                        <class>mpspam/observer</class>
+                        <method>controllerActionPredispatchContactsIndexPost</method>
+                    </mpspam>
+                </observers>
+            </controller_action_predispatch_contacts_index_post>
         </events>
     </frontend>
     <crontab>
