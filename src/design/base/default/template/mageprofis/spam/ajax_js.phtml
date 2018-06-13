@@ -1,0 +1,12 @@
+<script>
+    document.observe("dom:loaded", function () {
+        new Ajax.Request('<?php echo ?>',
+                {
+                    method: 'get',
+                    onSuccess: function (response) {
+                        //var product = response.responseText.evalJSON();
+                        //Yep!
+                    }
+                });
+    });
+</script>

@@ -1,5 +1,10 @@
 <?xml version="1.0"?>
 <layout>
+    <default>
+        <reference name="content">
+            <block type="core/template" name="mageprofis.spam.ajax_js" template="mageprofis/spam/ajax_js.phtml" />
+        </reference>
+    </default>
     <customer_account_create>
         <reference name="content">
             <block type="core/template" name="mageprofis.spam.register_js" template="mageprofis/spam/customer/register_js.phtml" />
