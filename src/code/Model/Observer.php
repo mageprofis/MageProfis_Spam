@@ -193,7 +193,10 @@ class MageProfis_Spam_Model_Observer extends Mage_Core_Model_Abstract
         {
             return true;
         }
-        
+        if(!$session->getMageProfisSpamAjaxCheck())
+        {
+            return true;
+        }
         return false;
     }
 

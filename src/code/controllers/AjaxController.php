@@ -4,7 +4,7 @@ class MageProfis_Spam_AjaxController extends Mage_Core_Controller_Front_Action
 {
     function indexAction()
     {
-        Mage::getSingleton('core/session')->setMageProfisSpamAjax(true);
+        Mage::getSingleton('core/session')->setMageProfisSpamAjaxCheck(true);
 
         $result = array(
             'check' => 'success', 
