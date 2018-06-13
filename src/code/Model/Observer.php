@@ -25,6 +25,11 @@ class MageProfis_Spam_Model_Observer extends Mage_Core_Model_Abstract
             Mage::helper('mpspam')->setPenaltyRequest($ip, 99);
             $this->throw403();
         }
+        
+        if($this->_sessionCheck())
+        {
+            $this->throw403();
+        }
 
         Mage::helper('mpspam')->setPenaltyRequest($ip);
     }
@@ -178,6 +183,17 @@ class MageProfis_Spam_Model_Observer extends Mage_Core_Model_Abstract
         {
             return true;
         }
+        return false;
+    }
+    
+    protected function _sessionCheck()
+    {
+        $session = Mage::getSingleton('core/session');
+        if(!$session->getMageProfisSpamSimpleCheck())
+        {
+            return true;
+        }
+        
         return false;
     }
 

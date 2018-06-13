@@ -43,6 +43,15 @@
             </updates>
         </layout>
         <events>
+            <controller_action_predispatch>
+                <observers>
+                    <mpspam>
+                        <type>singleton</type>
+                        <class>mpspam/observer_session</class>
+                        <method>simpleCheck</method>
+                    </mpspam>
+                </observers>
+            </controller_action_predispatch>
             <controller_action_predispatch_newsletter_subscriber_new>
                 <observers>
                     <mpspam>
