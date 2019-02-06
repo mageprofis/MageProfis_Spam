@@ -25,6 +25,11 @@ class MageProfis_Spam_Model_Observer extends Mage_Core_Model_Abstract
             Mage::helper('mpspam')->setPenaltyRequest($ip, 99);
             $this->throw403();
         }
+        
+        if($this->_sessionCheck())
+        {
+            $this->throw403();
+        }
 
         Mage::helper('mpspam')->setPenaltyRequest($ip);
     }
@@ -226,6 +231,20 @@ class MageProfis_Spam_Model_Observer extends Mage_Core_Model_Abstract
         }
         // check general ua list
         if (isset($_SERVER['HTTP_USER_AGENT']) && !Mage::helper('mpspam')->checkUserAgent($_SERVER['HTTP_USER_AGENT']))
+        {
+            return true;
+        }
+        return false;
+    }
+    
+    protected function _sessionCheck()
+    {
+        $session = Mage::getSingleton('core/session');
+        if(!$session->getMageProfisSpamSimpleCheck())
+        {
+            return true;
+        }
+        if(!$session->getMageProfisSpamAjaxCheck())
         {
             return true;
         }

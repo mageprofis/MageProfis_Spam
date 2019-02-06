@@ -1,0 +1,15 @@
+<?php if (!Mage::getSingleton('core/session')->getMageProfisSpamAjaxCheck()): ?>
+    <script>
+        document.observe("dom:loaded", function () {
+            new Ajax.Request('<?php echo Mage::getUrl('mpsp/ajax/index') ?>',
+                    {
+                        method: 'get',
+                        onSuccess: function (response) {
+                            //var product = response.responseText.evalJSON();
+                            //Yep!
+                        }
+                    }
+            );
+        });
+    </script>
+<?php endif; ?>

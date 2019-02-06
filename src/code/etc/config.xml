@@ -35,6 +35,15 @@
         </resources>
     </global>
     <frontend>
+        <routers>
+            <mpsp>
+                <use>standard</use>
+                <args>
+                    <module>MageProfis_Spam</module>
+                    <frontName>mpsp</frontName> <!-- we don't want the word 'spam' in a url -->
+                </args>
+            </mpsp>
+        </routers>
         <layout>
             <updates>
                 <mpspam>
@@ -43,6 +52,15 @@
             </updates>
         </layout>
         <events>
+            <controller_action_predispatch>
+                <observers>
+                    <mpspam>
+                        <type>singleton</type>
+                        <class>mpspam/observer_session</class>
+                        <method>simpleCheck</method>
+                    </mpspam>
+                </observers>
+            </controller_action_predispatch>
             <controller_action_predispatch_newsletter_subscriber_new>
                 <observers>
                     <mpspam>
