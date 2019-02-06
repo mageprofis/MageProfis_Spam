@@ -68,6 +68,14 @@
                     </mpspam>
                 </observers>
             </controller_action_predispatch_contacts_index_post>
+            <controller_action_predispatch_review_product_post>
+                <observers>
+                    <mpspam>
+                        <class>mpspam/observer</class>
+                        <method>controllerActionPredispatchProductReviewCreatepost</method>
+                    </mpspam>
+                </observers>
+            </controller_action_predispatch_review_product_post>
         </events>
     </frontend>
     <crontab>

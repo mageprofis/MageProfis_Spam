@@ -10,4 +10,9 @@
             <block type="core/template" name="mageprofis.spam.register_js" template="mageprofis/spam/contacts/js.phtml" />
         </reference>
     </contacts_index_index>
+    <catalog_product_view>
+        <reference name="content">
+            <block type="core/template" name="mageprofis.spam.register_js" template="mageprofis/spam/reviews/review_js.phtml" />
+        </reference>
+    </catalog_product_view>
 </layout>

@@ -35,7 +35,7 @@ class MageProfis_Spam_Model_Observer extends Mage_Core_Model_Abstract
     }
 
 /**
-     * check on customer register
+     * check on contact page
      * 
      * @return void
      */
@@ -149,6 +149,57 @@ class MageProfis_Spam_Model_Observer extends Mage_Core_Model_Abstract
         Mage::helper('mpspam')->setPenaltyRequest($ip);
     }
 
+    /**
+     * check on customer register
+     * 
+     * @return void
+     */
+    public function controllerActionPredispatchProductReviewCreatepost($observer)
+    {
+        if($this->_generalCheck())
+        {
+            $this->throw403();
+        }
+
+        $ip = Mage::helper('core/http')->getRemoteAddr(false);
+        if (Mage::helper('mpspam')->isPenalty($ip))
+        {
+            $this->throw403();
+        }
+
+        // check on Name values
+        $checkNames = array(
+            'nickname',
+            'title'
+        );
+        foreach ($checkNames as $_name)
+        {
+            $value = Mage::app()->getRequest()->getParam($_name);
+            if (!empty($value) && (stristr($value, 'http://') || stristr($value, 'https://')))
+            {
+                $this->throw403();
+            }
+        }
+
+        $mps_id = Mage::app()->getRequest()->getParam('mps_id');
+        $split = explode("O", $mps_id);
+        
+        if(!$mps_id)
+        {
+            $this->throw403();
+        }
+        
+        if(!is_array($split) || count($split)!=2)
+        {
+            $this->throw403();
+        }
+        
+        if($split[1]!=Mage::helper('mpspam')->getNumberOfTheDay())
+        {
+            $this->throw403();
+        }
+        Mage::helper('mpspam')->setPenaltyRequest($ip);
+    }
     /**
      * simple check on current request
      * 
