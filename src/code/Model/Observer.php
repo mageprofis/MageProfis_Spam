@@ -205,6 +205,27 @@ class MageProfis_Spam_Model_Observer extends Mage_Core_Model_Abstract
         }
         Mage::helper('mpspam')->setPenaltyRequest($ip);
     }
+
+    /**
+     * check search result
+     * 
+     * @return void
+     */
+    public function controllerActionPredispatchCatalogsearchResultIndex($observer)
+    {
+        $query = Mage::app()->getRequest()->getParam('q', null);
+        $query = mb_strtolower($query, 'UTF-8'); // everything to lower
+        $query = preg_replace('!\s+!', ' ', $query); // may double spaces!
+        if (strstr($query, 'union select'))
+        {
+            $this->throw403();
+        }
+        if (strstr($query, 'unhex(hex(version()))'))
+        {
+            $this->throw403();
+        }
+    }
+
     /**
      * simple check on current request
      * 
