@@ -94,6 +94,14 @@
                     </mpspam>
                 </observers>
             </controller_action_predispatch_review_product_post>
+            <controller_action_predispatch_catalogsearch_result_index>
+                <observers>
+                    <mpspam>
+                        <class>mpspam/observer</class>
+                        <method>controllerActionPredispatchCatalogsearchResultIndex</method>
+                    </mpspam>
+                </observers>
+            </controller_action_predispatch_catalogsearch_result_index>
         </events>
     </frontend>
     <crontab>
